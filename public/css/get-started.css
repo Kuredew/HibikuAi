@@ -1,0 +1,55 @@
+@font-face {
+    font-family: 'google-sans'; /* Name your font family */
+    src: url('GOOGLESANS-REGULAR.ttf'); /* Locate the .ttf file within your directory*/
+}
+
+*{
+    margin: 0;
+    padding: 0;
+}
+
+body{
+    display: flex;
+    align-items: center;
+    font-family: google-sans;
+}
+
+.container {
+    width: 100vw;
+    height: 100vh;
+    background-color: rgb(22, 22, 22);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.card {
+    padding: 40px;
+    text-align: center;
+    border-radius: 10px;
+    color: rgb(207, 207, 207);
+    background-color: rgb(36, 36, 36);
+}
+
+p{
+    font-size: small;
+    opacity: 50%;
+}
+
+button {
+    font-family: google-sans;
+    border: none;
+    margin-top: 100px;
+    border-radius: 5px;
+    padding: 10px;
+    width: 100%;
+    background-color: rgb(75, 75, 75);
+    text-decoration: none;
+    color: white;
+    transition: 0.5s;
+}
+
+button:hover{
+    cursor: pointer;
+    background-color: rgb(58, 58, 58);
+}

@@ -1,0 +1,108 @@
+@font-face {
+    font-family: 'google-sans'; /* Name your font family */
+    src: url('GOOGLESANS-REGULAR.ttf'); /* Locate the .ttf file within your directory*/
+}
+
+*{
+    margin: 0;
+    padding: 0;
+}
+
+body{
+    display: flex;
+    align-items: center;
+    font-family: google-sans;
+}
+
+.container {
+    width: 100vw;
+    height: 100vh;
+    background-color: rgb(22, 22, 22);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.card {
+    padding: 40px;
+    text-align: center;
+    border-radius: 10px;
+    color: rgb(207, 207, 207);
+    background-color: rgb(36, 36, 36);
+}
+
+.error{
+    opacity: 100%;
+    color: rgb(255, 0, 0);
+}
+
+p{
+    font-size: small;
+    opacity: 50%;
+}
+
+button {
+    margin-top: 20px;
+    font-family: google-sans;
+    border: none;
+    border-radius: 5px;
+    padding: 10px;
+    width: 100%;
+    background-color: rgb(75, 75, 75);
+    text-decoration: none;
+    color: white;
+    transition: 0.5s;
+}
+
+button:hover{
+    cursor: pointer;
+    background-color: rgb(58, 58, 58);
+}
+
+a{
+    color: aqua;
+}
+
+a:hover{
+    color: rgb(0, 255, 85);
+}
+
+.form{
+    margin-top: 30px;
+    text-align: left;
+    margin-bottom: 10px;
+}
+
+
+input{
+    margin-bottom: 10px;
+    width: 100%;
+    height: 40px;
+    border-radius: 4px;
+    background-color: rgb(75, 75, 75);
+    transition: 0.5s;
+    border: none;
+    outline: none;
+    color: white;
+    font-family: google-sans;
+
+    padding-left: 10px;
+
+    -webkit-box-sizing: border-box; /* Safari/Chrome, other WebKit */
+    -moz-box-sizing: border-box;    /* Firefox, other Gecko */
+    box-sizing: border-box;         /* Opera/IE 8+ */
+}
+
+input:hover{
+    background-color: rgb(58, 58, 58);
+}
+
+input[data-autocompleted] {
+    background-color: transparent !important;
+}
+
+input:-webkit-autofill,
+input:-webkit-autofill:focus {
+    transition: background-color 0s 0s, color 0s 0s;
+    transition-delay: calc(infinity * 1s);
+}

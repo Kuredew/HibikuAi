@@ -1,0 +1,3 @@
+socketIdArray = {}
+
+module.exports = socketIdArray

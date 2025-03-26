@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Hibikumonogatari | <%= user %></title>
+    <link rel="stylesheet" href="css/chat/style.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js" defer></script>
+    <link rel="stylesheet" href="/css/chat/atom-one-dark.css">
+    <script src="https://cdn.jsdelivr.net/npm/showdown/dist/showdown.min.js" defer></script>
+    <script src="js/chat/script.js" defer></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css" integrity="sha512-Evv84Mr4kqVGRNSgIGL/F/aIDqQb7xQ2vcrdIwxfjThSH8CSR7PBEakCr51Ck+w+/U6swU2Im1vVX0SVk9ABhg==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+</head>
+<body></body>
+    <div id='background-sidebar'>
+    </div>
+    <div id="background-profile-options">
+
+    </div>
+    <nav id="nav">
+        <button class="btn-sidebar" id="btn-sidebar"><i class="fa-solid fa-bars"></i></button>
+        <div class="model-name"><p class="title" id="username"><%= user%></p></div>
+        <div class="profile" ><img id="profile" src="Furina 5.jpg" alt=""></div>
+        
+    </nav>
+    <aside id="sidebar">
+        <div class="container">
+            <div class="sidebar-navbar">
+                <div class="icon">
+                    <a href=""><i class="fa-solid fa-pencil"></i></a>
+                </div>
+                <div class="icon right">
+                    <a href=""><i class="fa-solid fa-magnifying-glass"></i></a>
+                </div>
+            </div>
+            <div class="sidebar-summarry">
+                <a href="/"><p>New Chat</p></a>
+                <a href=""><p>Explore</p></a>
+                <a href="/live-chat"><p>Global Chat</p></a>
+            </div>
+            <div class="chat-history">
+                <div class="chat" id="chat-history">
+                <% for (const chat of chats) { %>
+                    <div class="chat-box <%= ('active' in chat) ? (chat['active']) ? 'active' : 'none' : 'none' %>">
+                        <a href="/chat?chatId=<%= chat['uuid'] %>"><p><%= chat['name'] %></p></a>
+                    </div>
+                <% } %>
+                </div>
+                
+            </div>
+            <div class="ads">
+                <div class="box"></div>
+                <p>Hibikumonogatari</p>
+                <p class="comment">Talk to ur model in 1 framework</p>
+            </div>
+        </div>
+    </aside>
+    <main id="main">
+        <div  id="chat-container" class="chat-container">
+            <% for (const chat of loadedChat) { %>
+                <% if (chat['role'] == 'system') {continue} %>
+                <% if (chat['role'] == 'user') { %>
+                    <div class="user-chat"><%- chat['content'] %></div>
+                    <% continue %>
+                <% } if (chat['role'] == 'assistant') { %>
+                    <div class="ai-chat"><%- chat['content'] %></div>
+                    <% continue %>
+                <% } else { %>
+                    <% if (chat['role'] == user) { %>
+                        <div class="user-chat"><%- chat['content'] %></div>         
+                        <% continue %>               
+                    <% } else { %>
+                    <div class="friend-chat"><%- `<strong>${chat['role']}</strong><br>${chat['content']}` %></div>
+                    <% continue %>
+                    <% } %>
+                <% } %>
+            <% } %>
+        </div>
+    </main>
+    <footer>
+        <div class="input-chat">
+            <div class="input-container">
+                <div class="input">
+                    <input id="input-chat"  type="text" name="input-chat" placeholder="Ask me Anything">
+                    <button id="send-btn" class="send-btn"><i class="fa-solid fa-paper-plane"></i></button>
+                </div>
+            </div>
+        </div>
+    </footer>
+    <script src="http://localhost:3030/socket.io/socket.io.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/languages/go.min.js" defer></script>
+</body>
+</html>
