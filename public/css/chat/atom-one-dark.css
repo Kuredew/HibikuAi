@@ -1,6 +1,6 @@
 @font-face {
   font-family: 'jetbrains'; /* Name your font family */
-  src: url('JETBRAINSMONONERDFONTMONO-REGULAR.TTF'); /* Locate the .ttf file within your directory*/
+  src: url('../../fonts/JETBRAINSMONONERDFONTMONO-REGULAR.TTF'); /* Locate the .ttf file within your directory*/
 }
 
 /*
