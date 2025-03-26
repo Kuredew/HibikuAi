@@ -1,6 +1,6 @@
 @font-face {
     font-family: 'google-sans'; /* Name your font family */
-    src: url('GOOGLESANS-REGULAR.ttf'); /* Locate the .ttf file within your directory*/
+    src: url('../fonts/GOOGLESANS-REGULAR.TTF'); /* Locate the .ttf file within your directory*/
 }
 
 *{
