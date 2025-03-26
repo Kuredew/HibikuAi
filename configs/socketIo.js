@@ -6,7 +6,7 @@ const server = http.Server(app)
 
 const io = require('socket.io')(server)
 
-server.listen(3030, (e) => {
+server.listen(8080, (e) => {
     console.log('Socket IO listen on port 3030')
 })
 

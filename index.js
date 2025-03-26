@@ -47,6 +47,6 @@ app.post('/register', (req, res) => {
 
 
 
-app.listen(3030, '0.0.0.0', () => {
+app.listen(8080, () => {
     console.log('Server running on port 3030');
 })
