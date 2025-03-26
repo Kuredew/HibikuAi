@@ -1,5 +1,5 @@
 const mongoose = require('mongoose')
-const { mongoDbConnectionUri } = ('../constants/environment')
+const { mongoDbConnectionUri } = require('../constants/environment')
 
 mongoose.connect(
     mongoDbConnectionUri,
