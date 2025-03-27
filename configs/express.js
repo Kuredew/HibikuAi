@@ -16,7 +16,7 @@ app.use(session({
     secret: 'secret',
     resave: false,
     saveUninitialized: true,
-    store: new MongoStore.create({
+    store: MongoStore.create({
         mongoose
     })
 }))
