@@ -1,7 +1,7 @@
 const mongoose = require('mongoose')
 const { mongoDbConnectionUri } = require('../constants/environment')
 
-mongoose.connect(
+const clientPromise = mongoose.connect(
     mongoDbConnectionUri,
     {
         useNewUrlParser: true,
@@ -11,4 +11,4 @@ mongoose.connect(
 mongoose.Promise = global.Promise
 const db = mongoose.connection
 
-module.exports = { mongoose, db }
+module.exports = { mongoose, db, clientPromise }
