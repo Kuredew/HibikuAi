@@ -1,4 +1,4 @@
-const mongoose = require('../configs/mongoConnection')
+const { mongoose } = require('../configs/mongoConnection')
 
 const chatSchema = new mongoose.Schema({
     username: String,
