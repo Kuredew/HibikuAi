@@ -8,5 +8,7 @@ mongoose.connect(
         useUnifiedTopology: true
     }
 )
+mongoose.Promise = global.Promise
+const db = mongoose.connection
 
-module.exports = mongoose
+module.exports = { mongoose, db }
