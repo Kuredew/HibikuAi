@@ -6,7 +6,7 @@ const session = require('express-session')
 
 const app = express()
 const MongoStore = require('connect-mongo')
-const { clientPromise } = require('./mongoConnection')
+const { db } = require('./mongoConnection')
 
 // buat Middleware
 app.use(express.static('public'))
@@ -17,7 +17,7 @@ app.use(session({
     resave: false,
     saveUninitialized: true,
     store: MongoStore.create({
-        clientPromise
+        db
     })
 }))
 app.use(flash())
