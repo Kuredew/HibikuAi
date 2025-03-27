@@ -150,11 +150,12 @@ async function addMessage(text, entity, stream=false) {
                 const converted = converter.makeHtml(kalimatStrStream)
 
                 userChat.innerHTML = converted
+                /*
                 main.scrollTo({
                     top: main.scrollHeight,
                     behavior: 'smooth'
-                })
-                //main.scrollTop = main.scrollHeight
+                })*/
+                main.scrollTop = main.scrollHeight
 
                 await sleep(10)
             }
