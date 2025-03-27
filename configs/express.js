@@ -5,7 +5,7 @@ const session = require('express-session')
 
 
 const app = express()
-const MongoStore = require('connect-mongo')(session)
+const MongoStore = require('connect-mongo')
 const { mongoose } = require('./mongoConnection')
 
 // buat Middleware
