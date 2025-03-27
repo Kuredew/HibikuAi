@@ -383,6 +383,10 @@ aside .container {
     transition: 0.2s;
 }
 
+.sidebar-summarry a {
+    text-decoration: none;
+}
+
 .sidebar-summarry a p:hover{
     background-color: rgb(44, 44, 44)
 }
