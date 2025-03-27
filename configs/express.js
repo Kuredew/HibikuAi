@@ -6,7 +6,8 @@ const session = require('express-session')
 
 const app = express()
 const MongoStore = require('connect-mongo')
-const { db } = require('./mongoConnection')
+
+const { mongoDbConnectionUri } = require('../constants/environment')
 
 // buat Middleware
 app.use(express.static('public'))
@@ -17,7 +18,7 @@ app.use(session({
     resave: false,
     saveUninitialized: true,
     store: MongoStore.create({
-        db
+        mongoUrl: mongoDbConnectionUri
     })
 }))
 app.use(flash())
