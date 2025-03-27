@@ -7,6 +7,7 @@ const { randomUUID } = require('crypto')
 // Constants
 const socketIdArray = require('../constants/socketIo')
 const object = require('../constants/session')
+const { mainAiContext, titleAiContext, titleAiQuestion } = require('../constants/environment')
 
 // Model
 const Chat = require('../models/chatModel')
@@ -39,7 +40,7 @@ async function answer(req, res) {
         var chatContentList = []
         chatContentList.push({
             role: 'system',
-            content: 'namamu Kureichi, kamu adalah asisten yang sangat penyayang dan perhatian, kamu selalu pernyabar dalam menjawab pertanyaan pertanyaan user'
+            content: mainAiContext
         })
     }
 
@@ -94,10 +95,10 @@ async function answer(req, res) {
     
 
     if (object.session.newChat[user]) {
-        const pertanyaan = `Buatkan aku sebuah title chat dari percakapan berikut ini (OUTPUT HANYA TITLE, karena balasanmu akan langsung aku masukkan kedalam Web chatku), berikut percakapannya :\n\nPerson1 : ${messageUser}\n\nPerson2 : ${responses}`
+        const pertanyaan = `${titleAiQuestion}\n\nPerson1 : ${messageUser}\n\nPerson2 : ${responses}`
         const pertanyaanObjList = [{
             role: 'system',
-            content: 'Kamu adalah asisten yang bertugas membuat judul dari percakapan user dan ai, kamu hanya bisa menjawab judulnya, kamu tidak diperbolehkan berbicara selain itu, selain itu, jawablah user dengan bahasa yang dipahami oleh user.'
+            content: titleAiContext
         },{
             role: 'user',
             content: pertanyaan
