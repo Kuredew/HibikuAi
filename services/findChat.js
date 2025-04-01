@@ -1,15 +1,15 @@
 const Chat = require('../models/chatModel')
 
 
-async function findChat(username){
-    const chat = await Chat.find({username: username})
+async function findChat(userId){
+    const chat = await Chat.find({userId: userId})
 
     console.log(chat)
     return chat
 }
 
-async function loadChat(username, chatId) {
-    const chat = await Chat.findOne({username: username, uuid: chatId})
+async function loadChat(userId, chatId) {
+    const chat = await Chat.findOne({userId: userId, uuid: chatId})
 
     console.log(chat)
 

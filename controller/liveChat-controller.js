@@ -5,10 +5,10 @@ const Chat = require('../models/chatModel')
 
 async function render(req, res) {
     object.session.liveChat[req.session.user] = true
-    const loadedChat = await loadChat('developersnigger', 'ngawur')
+    const loadedChat = await loadChat('8998', 'ngawur')
     const loadedChatContent = loadedChat['content']
 
-    const chatHistory = await findChat(req.session.user)
+    const chatHistory = await findChat(req.session.userId)
     const chatHistoryReverse = chatHistory.reverse()
 
     res.render('chat', { user: req.session.user, chats: chatHistoryReverse, loadedChat: loadedChatContent})

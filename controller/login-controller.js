@@ -14,6 +14,7 @@ async function login(req, res) {
 
     if (user && password == user.password) {
         req.session.user = user.username
+        req.session.userId = user._id
         req.session.loggedIn = true
         res.redirect('/')
     } else {

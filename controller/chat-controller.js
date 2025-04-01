@@ -1,4 +1,3 @@
-
 // Needed library
 const showdown = require('showdown')
 const hljs = require('highlight.js')
@@ -92,7 +91,7 @@ async function answer(req, res) {
         message: response
     })*/
 
-    
+
 
     if (object.session.newChat[user]) {
         const pertanyaan = `${titleAiQuestion}\n\nPerson1 : ${messageUser}\n\nPerson2 : ${responses}`
@@ -114,6 +113,7 @@ async function answer(req, res) {
 
         const newChat = new Chat({
             username: req.session.user,
+            userId: req.session.userId,
             name: response2,
             uuid: uuidGenerated,
             content: chatContentList
@@ -133,10 +133,10 @@ async function load(req, res) {
     object.session.newChat[req.session.user] = false
     object.session.chatId[req.session.user] = chatId
     object.session.liveChat[req.session.user] = false
-    
+
     let chatListConverted = []
-    const loadedChat = await loadChat(req.session.user, chatId)
-    const chat = await findChat(req.session.user)
+    const loadedChat = await loadChat(req.session.userId, chatId)
+    const chat = await findChat(req.session.userId)
     const chatHistoryList = []
 
     for (const chats of loadedChat.content) {
@@ -177,7 +177,7 @@ async function render(req, res, next) {
     object.session.chatId[req.session.user] = undefined
     object.session.liveChat[req.session.user] = false
 
-    const findedChat = await findChat(req.session.user)
+    const findedChat = await findChat(req.session.userId)
     res.render('chat', { user: req.session.user, chats: findedChat.reverse(), loadedChat: []})
 
     next()
