@@ -25,7 +25,7 @@ const converter = new showdown.Converter()
 
 async function answer(req, res) {
     const messageUser = req.query.message
-    const user = req.session.user
+    const user = req.session.userId
 
     if (object.session.chatId[user]){
         const chatId = object.session.chatId[user]
