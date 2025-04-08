@@ -8,7 +8,8 @@ const sessionMiddleware = require('express-session')({
     saveUninitialized: true,
     store: MongoStore.create({
         mongoUrl: mongoDbConnectionUri
-    })
+    }),
+    maxAge: Date.now() + (30 * 24 * 3600 * 1000)
 })
 
 module.exports = sessionMiddleware
