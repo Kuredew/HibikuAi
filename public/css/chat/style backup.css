@@ -1,6 +1,6 @@
 @font-face {
     font-family: 'google-sans'; /* Name your font family */
-    src: url('../../fonts/HelveticaNowDisplay-Regular.ttf'); /* Locate the .ttf file within your directory*/
+    src: url('../../fonts/GOOGLESANS-REGULAR.TTF'); /* Locate the .ttf file within your directory*/
 }
 
 @keyframes fadeIn {
@@ -68,26 +68,7 @@ code{
     border-radius: 20px;
 }
 
-::-webkit-scrollbar {
-    width: 5px;
-}
 
-/* Track */
-::-webkit-scrollbar-track {
-    -webkit-box-shadow: white;
-    -webkit-border-radius: 10px;
-    border-radius: 10px;
-}
-
-/* Handle */
-::-webkit-scrollbar-thumb {
-    -webkit-border-radius: 10px;
-    border-radius: 10px;
-    background: rgb(78, 78, 78);
-}
-::-webkit-scrollbar-thumb:window-inactive {
-    background: rgb(78, 78, 78);
-}
 
 body{
     font-family: google-sans;
@@ -206,7 +187,14 @@ img{
     background-color: rgb(68, 68, 68);
 }
 
-
+aside{
+    background-color: rgb(29, 29, 29);
+    height: 100vh;
+    position: sticky;
+    top: 0;
+    align-self: start;
+    grid-area: sidebar;
+}
 
 main{
     overflow-y: scroll;
@@ -235,7 +223,6 @@ main::-webkit-scrollbar {
     margin-left: auto;
     background-color: rgb(46, 46, 46);
     animation: fadeIn 0.5s ease-out;
-    overflow-x: auto;
 }
 
 .friend-chat{
@@ -331,17 +318,7 @@ input:-webkit-autofill:focus {
     border: none;
 }
 
-aside{
-    background-color: rgb(29, 29, 29);
-    height: 100dvh;
-    position: sticky;
-    top: 0;
-    align-self: start;
-    grid-area: sidebar;
-}
-
 aside .container{
-    height: calc(100% - 190px);/*
     display: grid;
     grid-template-columns: 1fr;
     grid-template-rows: 8vh 24vh 58vh 10vh;
@@ -349,7 +326,7 @@ aside .container{
     "sidebar-navbar"
     "sidebar-summarry"
     "chat-history"
-    "ads";*/
+    "ads";
 }
     
     /*
@@ -414,28 +391,20 @@ aside .container {
     background-color: rgb(44, 44, 44)
 }
 
-.sidebar-chat-history{
-    display: flex;
-    flex-direction: column;
-    width: 100%;
-    height: 100%; /* AKU INGIN MEMBUAT DIV INI MENGISI RUANG KOSONG */
-    justify-content: space-between;
-}
-
-.sidebar-chat-history .chat-history{
+.chat-history{
     padding: 10px;
     grid-area: chat-history;
-    overflow-y: auto;
+    overflow-y: scroll;
     max-height: 100%;
 }
-/*
-.sidebar-chat-history .chat-history::-webkit-scrollbar {
+
+.chat-history::-webkit-scrollbar {
     display: none;
     overflow: hidden;
     }
-*/
 
-.sidebar-chat-history .chat-history .chat .chat-box a{
+
+.chat-history .chat .chat-box a{
     color: linear;
     padding-left: 10px;
     display: flex;
@@ -444,12 +413,12 @@ aside .container {
     height: 40px;
     background: none;
     border-radius: 10px;
-    margin-top: 2px;
+    margin-top: 5px;
     transition: 0.2s;
     text-decoration: none;
 }
 
-.sidebar-chat-history .chat-history .chat .chat-box a p{
+.chat-history .chat .chat-box a p{
     color: white;
     display: block;/* or inline-block */
   text-overflow: ellipsis;
@@ -459,24 +428,23 @@ aside .container {
   line-height: 1.8em;
 }
 
-.sidebar-chat-history .chat-history .chat .active a{
+.chat-history .chat .active a{
     background-color: rgb(53, 53, 53);
 }
 
-.sidebar-chat-history .chat-history .chat-box a:hover{
+.chat-history .chat-box a:hover{
     background-color: rgb(44, 44, 44)
 }
 
-.sidebar-chat-history .ads{
+.ads{
     padding: 10px;
-    height: 70px;
     font-size: small;
     grid-area: ads;
-
-    width: 100%;
+    position: absolute;
+    bottom: 0;
 }
 
-.sidebar-chat-history .ads .comment{
+.ads .comment{
     opacity: 40%;
     font-size: small;
 }
@@ -484,7 +452,7 @@ aside .container {
 @media(max-width: 800px) {
     body{
         grid-template-columns: 0px 1fr;
-        font-size: small;
+        font-size: smaller;
     }
     #btn-sidebar {
         display: block;
@@ -511,9 +479,5 @@ aside .container {
         width: 100vw;
         height: 100vh;
         z-index: 9;
-    }
-
-    .user-chat {
-        max-width: 60dvw;
     }
 }

@@ -1,6 +1,4 @@
-const session = require('express-session')
 const User = require('./models/userModel')
-const bodyParser = require('body-parser')
 
 const loginRouter = require('./routes/login-routes')
 const chatRouter = require('./routes/chat-routes')
@@ -43,6 +41,15 @@ app.post('/register', (req, res) => {
     newUser.save()
     res.redirect('/')
 })
+
+
+// Start Server bind with Socket IO
+const { server } = require('./configs/socketIo')
+server.listen(8080, (e) => {
+    console.log('Socket IO listen on port 8080')
+})
+
+
 
 
 

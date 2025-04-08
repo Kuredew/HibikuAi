@@ -1,6 +1,6 @@
 const {findChat, loadChat} = require('../services/findChat')
 const object = require('../constants/session')
-const io = require('../configs/socketIo')
+const { io } = require('../configs/socketIo')
 const Chat = require('../models/chatModel')
 
 async function render(req, res) {
@@ -20,7 +20,7 @@ async function answer(req, res) {
 
     io.emit('live-chat-message', { message: message, user: user })
 
-    let chatContent = await loadChat('developersnigger', 'ngawur')
+    let chatContent = await loadChat('8998', 'ngawur')
 
     let chatContentList = chatContent['content']
 
@@ -30,7 +30,7 @@ async function answer(req, res) {
     }
     chatContentList.push(obj)
     chatContent.content = chatContentList
-    //chatContent.save()
+    chatContent.save()
 
     res.send('end')
     console.log('Mendapatkan pesan POST dan membroadcast ke semua user.')

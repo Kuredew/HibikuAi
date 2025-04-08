@@ -1,5 +1,3 @@
-
-
 const sidebar = document.getElementById('sidebar')
 const btnSidebar = document.getElementById('btn-sidebar')
 const backgroundSidebar = document.getElementById('background-sidebar')
@@ -69,7 +67,7 @@ socket.on('live-chat-message', (obj) => {
 
     if (!(thisUser == user) && window.location.pathname == '/live-chat') {
         addMessage(finalMessage, 'friend-chat')
-        console.log('Mendapatkan pesan dari websocket.')
+        console.log('Mendapatkan pesan dari SocketIo')
     }
 })
 
@@ -142,7 +140,7 @@ async function addMessage(text, entity, stream=false) {
             const chunk = decoder.decode(value)
             console.log(chunk)
 
-            const words = chunk.split(/(\s)/)
+            const words = chunk.split(/(\s+)/)
 
             for await (const word of words) {
                 kalimatStrStream += word

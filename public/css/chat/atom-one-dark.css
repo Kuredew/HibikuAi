@@ -29,6 +29,8 @@ pre .hljs {
   border-radius: 20px;
   color: #abb2bf;
   background: #282c34;
+  max-width: 100%;
+  overflow-x: auto;
 }
 
 code {

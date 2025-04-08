@@ -1,4 +1,5 @@
 const session = {
+    userId: {},
     newChat: {},
     chatId: {},
     liveChat: {},

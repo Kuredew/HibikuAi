@@ -12,13 +12,14 @@ const { mainAiContext, titleAiContext, titleAiQuestion } = require('../constants
 const Chat = require('../models/chatModel')
 
 // Configs
-const io = require('../configs/socketIo')
+const { io } = require('../configs/socketIo')
 
 // Services
 const openaiController = require('../services/openAi')
 const { findChat, loadChat } = require('../services/findChat')
 
-
+// Map
+const { get: socketSessionGet } = require('../utils/sessionSocketMap')
 
 const converter = new showdown.Converter()
 
@@ -27,16 +28,19 @@ async function answer(req, res) {
     const messageUser = req.query.message
     const user = req.session.userId
 
+    let chatContent
+    let chatContentList
+
     if (object.session.chatId[user]){
         const chatId = object.session.chatId[user]
 
         //res.json({ message: `Data Berhasil di dapatkan, pesanmu adalah ${messageUser}` })
         //console.log(req.body)
 
-        var chatContent = await loadChat(user, chatId)
-        var chatContentList = chatContent['content']
+        chatContent = await loadChat(user, chatId)
+        chatContentList = chatContent['content']
     } else {
-        var chatContentList = []
+        chatContentList = []
         chatContentList.push({
             role: 'system',
             content: mainAiContext
@@ -50,6 +54,7 @@ async function answer(req, res) {
 
     chatContentList.push(userMsgObj)
 
+    console.log(chatContentList)
     var response = await openaiController.ask(chatContentList)
 
 
@@ -59,10 +64,8 @@ async function answer(req, res) {
 
     let responses = ''
     for await (const chunk of response){
-        console.log(chunk)
         
         const responseFinal = chunk.choices[0]?.delta?.content || ''
-        console.log(responseFinal)
         if ('finish_reason' in chunk.choices[0]) {
             console.log('Streaming selesai!')
             res.write(responseFinal)
@@ -79,7 +82,6 @@ async function answer(req, res) {
                 chatContent.content = chatContentList
                 chatContent.save()
             }
-            console.log(responses)
 
             break
         }
@@ -93,7 +95,9 @@ async function answer(req, res) {
 
 
 
-    if (object.session.newChat[user]) {
+    if (object.session.chatId[user] == undefined) {
+        const socketId = socketIdArray[req.session.id]
+
         const pertanyaan = `${titleAiQuestion}\n\nPerson1 : ${messageUser}\n\nPerson2 : ${responses}`
         const pertanyaanObjList = [{
             role: 'system',
@@ -105,9 +109,9 @@ async function answer(req, res) {
 
         const response2 = await openaiController.askNoStream(pertanyaanObjList)
 
-        console.log(`Membuat Title baru berjudul: ${response2}`)
+        console.log(`Membuat Chat baru berjudul: ${response2}`)
 
-        io.to(socketIdArray[req.session.user]).emit('new-chat-title', response2) // TIDAK BERHASIL, ini yang ingin aku tanyakan kepadamu GPT, client tidak mendengarkan emit yang ini, apa masalahnya?, apa aku melakukan kesalahan?
+        io.to(socketId).emit('new-chat-title', response2) // TIDAK BERHASIL, ini yang ingin aku tanyakan kepadamu GPT, client tidak mendengarkan emit yang ini, apa masalahnya?, apa aku melakukan kesalahan?
 
         uuidGenerated = randomUUID()
 
@@ -123,16 +127,15 @@ async function answer(req, res) {
         object.session.chatId[user] = uuidGenerated
         object.session.newChat[user] = false
 
-        console.log(req.session)
     }
 }
 
 async function load(req, res) {
     const chatId = req.query.chatId
+    const user = req.session.userId
 
-    object.session.newChat[req.session.user] = false
-    object.session.chatId[req.session.user] = chatId
-    object.session.liveChat[req.session.user] = false
+    object.session.chatId[user] = chatId
+    object.session.liveChat[user] = false
 
     let chatListConverted = []
     const loadedChat = await loadChat(req.session.userId, chatId)
@@ -150,7 +153,6 @@ async function load(req, res) {
             role: role,
             content: convertedContent
         }
-        console.log(chatListObj)
         chatListConverted.push(chatListObj)
     }
 
@@ -166,16 +168,14 @@ async function load(req, res) {
 
         chatHistoryList.push(obj)
     }
-    console.log(chatListConverted)
     loadedChatList = []
 
     res.render('chat', { user: loadedChat.name, chats: chatHistoryList.reverse(), loadedChat: chatListConverted })
 
 }
 async function render(req, res, next) {   
-    object.session.newChat[req.session.user] = true
-    object.session.chatId[req.session.user] = undefined
-    object.session.liveChat[req.session.user] = false
+    object.session.chatId[req.session.userId] = undefined
+    object.session.liveChat[req.session.userId] = false
 
     const findedChat = await findChat(req.session.userId)
     res.render('chat', { user: req.session.user, chats: findedChat.reverse(), loadedChat: []})
@@ -184,17 +184,14 @@ async function render(req, res, next) {
 }
 
 function log(req, res) {
-    console.log(socketIdArray)
     console.log('session yang ada pada /chat ', req.session)
 }
 
 async function log2(req, res) {
-    console.log(object.session)
     if (object.session.newChat[req.session.user]) {
         object.session.newChat[req.session.user] = false
         console.log('NewChat session dimatikan.')
 
-        console.log(object.session)
     }
 }
 

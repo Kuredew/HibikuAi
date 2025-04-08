@@ -1,4 +1,4 @@
-//require('dotenv').config()
+require('dotenv').config()
 
 const openAiApiKey = process.env.OPEN_AI_API_KEY
 const openAiBaseUrl = process.env.OPEN_AI_BASE_URL
