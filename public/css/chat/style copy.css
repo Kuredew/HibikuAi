@@ -100,7 +100,7 @@ body{
     grid-template-areas: 
     "sidebar navbar"
     "sidebar main"
-    "sidebar main";
+    "sidebar footer";
 
     /*animation: fadeIn 1s ease-out;*/
     animation: fadeIn 0.5s ease-out;
@@ -221,8 +221,9 @@ main::-webkit-scrollbar {
 .chat-container{
     padding-left: 10%;
     padding-right: 10%;
-    padding-bottom: 165px;
 }
+
+
 
 .user-chat{
     margin-bottom: 50px;
@@ -234,7 +235,6 @@ main::-webkit-scrollbar {
     margin-left: auto;
     background-color: rgb(46, 46, 46);
     animation: fadeIn 0.5s ease-out;
-
     overflow-x: auto;
 }
 
@@ -257,38 +257,25 @@ main::-webkit-scrollbar {
 footer{
     display: flex;
     justify-content: center;
-    width: calc(100% - 250px);
-    position: fixed;
-    bottom: 0;
+    grid-area: footer;
 }
 
-.input-wrapper {
-    padding: 0 10% 15px 10%;
+.input-chat {
+    padding-left: 10%;
+    padding-right: 10%;
     width: 100%;
-    box-sizing: border-box;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
 }
-
-.input-wrapper .attention {
-    font-size: smaller;
-    opacity: 80%;
-}
-
 
 .input-container{
     padding-top: 10px;
-    padding-bottom: 10px;
     padding-left: 20px;
     padding-right: 10px;
     border: none;
     color: rgb(255, 255, 255);
     background-color: rgb(56, 56, 56);
     border-radius: 20px;
-    width: 100%;;
-    min-height: 100px;
-    height: fit-content;
+    width: 100%;
+    height: 100px;
     outline: none;
 
     box-shadow: rgba(0, 0, 0, 0.25) 0px 25px 50px -12px;
@@ -296,6 +283,7 @@ footer{
 
 .input{
     display: flex;
+    height: 100%;
     width: 100%;
 }
 
@@ -309,12 +297,7 @@ input:-webkit-autofill:focus {
     transition-delay: calc(infinity * 1s);
 }
 
-.input-wrapper .input-container .additional-wrapper {
-    display: flex;
-    justify-content: space-between;
-}
-
-.input-wrapper .input-container .additional-wrapper .send-wrapper .send-btn{
+.send-btn{
     color: white;
     min-height: 40px;
     max-height: 40px;
@@ -326,43 +309,26 @@ input:-webkit-autofill:focus {
     transition: 0.5s;
 }
 
-.input-wrapper .input-container .additional-wrapper .send-wrapper .send-btn:hover{
+.send-btn:hover{
     cursor: pointer;
     background-color: rgb(39, 39, 39);
 }
 
-.input-wrapper .input-container .input .input-box{
+.input-chat input{
+    opacity: 80%;
     color: white;
     font-family: google-sans;
-    background: none;
+    background-color: rgb(56, 56, 56);
     border: none;
     outline: none;
     outline: none;
     height: 40px;
     width: 100%;
     z-index: 1;
-    margin-bottom: 10px;
-    margin-top: 10px;
 }
 
-.input-wrapper .input-container .input .input-box:hover{
+.input-chat input:hover{
     border: none;
-}
-
-.input-wrapper .input-container .additional-wrapper .file-btn {
-    color: white;
-    min-height: 40px;
-    max-height: 40px;
-    max-width: 40px;
-    min-width: 40px;
-    border: solid rgb(99, 99, 99) 1px;
-    border-radius: 20px;
-    transition: 0.5s;
-    background: none;
-}
-
-.input-wrapper .input-container .additional-wrapper .file-btn:hover{
-    cursor: pointer;
 }
 
 aside{
@@ -518,7 +484,7 @@ aside .container {
 @media(max-width: 800px) {
     body{
         grid-template-columns: 0px 1fr;
-        font-size: smaller;
+        font-size: small;
     }
     #btn-sidebar {
         display: block;
@@ -530,9 +496,6 @@ aside .container {
         transition: 0.3s;
         z-index: 10;
         height: 100%;
-    }
-    footer {
-        width: 100%;
     }
     .show{
         display: block;
@@ -548,5 +511,9 @@ aside .container {
         width: 100vw;
         height: 100vh;
         z-index: 9;
+    }
+
+    .user-chat {
+        max-width: 60dvw;
     }
 }

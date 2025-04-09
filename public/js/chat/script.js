@@ -12,7 +12,15 @@ const inputChat = document.getElementById('input-chat')
 const chatHistory = document.getElementById('chat-history')
 const username = document.getElementById('username')
 
-const apiEndpoint = `${window.location.protocol}//${window.location.hostname}`
+const textarea = document.getElementById('input-chat');
+
+        textarea.addEventListener('keyup', (e) => {
+            textarea.style.height = '40px'
+            let scrollHeight = e.target.scrollHeight
+            textarea.style.height = `${scrollHeight}px`
+        })
+
+const apiEndpoint = `${window.location.protocol}//${window.location.hostname}:8080`
 console.log(`Loaded apiEndpoint at ${apiEndpoint}`)
 
 function toggleSidebar(){

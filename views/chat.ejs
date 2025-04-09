@@ -52,8 +52,8 @@
                 </div>
                 <div class="ads">
                     <div class="box"></div>
-                    <p>Hibikumonogatari</p>
-                    <p class="comment">Talk to ur model in 1 framework</p>
+                    <p>HibikuAI</p>
+                    <p class="comment">Using your LLM API to Roleplay</p>
                 </div>
             </div>
         </div>
@@ -79,17 +79,23 @@
                 <% } %>
             <% } %>
         </div>
-    </main>
-    <footer>
-        <div class="input-chat">
-            <div class="input-container">
-                <div class="input">
-                    <input id="input-chat"  type="text" name="input-chat" placeholder="Ask me Anything">
-                    <button id="send-btn" class="send-btn"><i class="fa-solid fa-paper-plane"></i></button>
+        <footer>
+            <div class="input-wrapper">
+                <div class="input-container">
+                    <div class="input">
+                        <textarea class="input-box" id="input-chat"  type="text" name="input-chat" placeholder="Ask me Anything"></textarea>
+                    </div>
+                    <div class="additional-wrapper">
+                        <button id="file-btn" class="file-btn"><i class="fa-solid fa-paperclip"></i></button>
+                        <div class="send-wrapper">
+                            <button id="send-btn" class="send-btn"><i class="fa-solid fa-paper-plane"></i></button>
+                        </div>
+                    </div>
                 </div>
+                <p class="attention">All this chat is fictional bruh, dont give your life into this shit</p>
             </div>
-        </div>
-    </footer>
+        </footer>
+    </main>
     <script src="/socket.io/socket.io.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/languages/go.min.js" defer></script>
 </body>
