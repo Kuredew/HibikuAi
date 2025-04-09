@@ -20,7 +20,7 @@ const textarea = document.getElementById('input-chat');
             textarea.style.height = `${scrollHeight}px`
         })
 
-const apiEndpoint = `${window.location.protocol}//${window.location.hostname}:8080`
+const apiEndpoint = `${window.location.protocol}//${window.location.hostname}`
 console.log(`Loaded apiEndpoint at ${apiEndpoint}`)
 
 function toggleSidebar(){
