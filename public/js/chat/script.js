@@ -11,13 +11,39 @@ const chatContainer = document.getElementById('chat-container')
 const inputChat = document.getElementById('input-chat')
 const chatHistory = document.getElementById('chat-history')
 const username = document.getElementById('username')
+let chatId = window.location.pathname.split('/')[2]
+console.log(chatId)
+
+function removeWelcome() {
+    document.querySelector('.welcome').remove()
+}
+
+let isWelcomeRemoved
+if (chatContainer.contains(document.querySelector('.user-chat'))) {
+    removeWelcome()
+
+    chatContainer.style.paddingBottom = '165px'
+    isWelcomeRemoved = true
+} else {
+    isWelcomeRemoved = false
+}
+
+sendButton.disabled = true
+mainScrollDown()
 
 const textarea = document.getElementById('input-chat');
 
-        textarea.addEventListener('keyup', (e) => {
+        textarea.addEventListener('input', (e) => {
+            if (textarea.value.length > 0) {
+                sendButton.disabled = false
+            } else {
+                sendButton.disabled = true
+            }
+
             textarea.style.height = '40px'
-            let scrollHeight = e.target.scrollHeight
+            let scrollHeight = textarea.scrollHeight
             textarea.style.height = `${scrollHeight}px`
+            chatContainer.style.paddingBottom = `${165 + scrollHeight - 40}px`
         })
 
 const apiEndpoint = `${window.location.protocol}//${window.location.hostname}`
@@ -120,7 +146,12 @@ function toggleProfileOptions() {
 
 profile.addEventListener('click', toggleProfileOptions)
 
-
+function mainScrollDown() {
+    main.scrollTo({
+        top: main.scrollHeight,
+        behavior: 'smooth'
+    })
+}
 
 // Message Handling
 const testText = 'lorem ipsum fdsalfjdslkafklsdjkckdsnklckdsfkfnklasfsd fsadjklfdsjal fdsn fkldsnfdn fkdsfkdscn skafnknd dsncdskcjsnc dscndscj dsjncdslancs al'
@@ -132,6 +163,10 @@ async function addMessage(text, entity, stream=false) {
     chatContainer.appendChild(userChat)
 
     if (stream) {
+
+        // Delete Loading
+        document.querySelector('.loader').remove()
+
         const reader = text.body.getReader()
         const decoder = new TextDecoder('utf-8')
 
@@ -185,16 +220,54 @@ async function addMessage(text, entity, stream=false) {
     } else {
         userChat.innerHTML = converter.makeHtml(text)
         
-        main.scrollTo({
-            top: main.scrollHeight,
-            behavior: 'smooth'
-        })
+        mainScrollDown()
+
+        await sleep(500)
+
+        loadingDiv = document.createElement('div')
+        loadingDiv.classList.add('loader')
+
+        chatContainer.appendChild(loadingDiv)
+        
+        mainScrollDown()
+
         //main.scrollTop = main.scrollHeight
     }
 }
 
+async function addAttachments(fileDescArray) {
+    const attachmentsDiv = document.createElement('div')
+    attachmentsDiv.classList.add('attachments')
+    chatContainer.appendChild(attachmentsDiv)
+
+    innerHTML = ''
+    for (const file of fileDescArray) {
+        const HTML = `
+                            <div id="file" class="file-wrapper">
+                                <div class="thumbnail"><i class="fa-solid fa-file"></i></div>
+                                <div class="description-wrapper">
+                                    <span class="title">${file.file_name}</span>
+                                    <span class="full-size">${file.file_size}<a href="${file.file_url}"><i class="fa-solid fa-link link"></i></a></span>
+                                </div>
+                            </div>`
+        innerHTML += HTML
+    }
+    attachmentsDiv.innerHTML = innerHTML
+}
 async function userSend(text) {
-    addMessage(text, 'user')
+    fileContainer.innerHTML = ''
+
+    if (!(isWelcomeRemoved)) {
+        removeWelcome()
+    }
+
+    await addAttachments(fileDescArray)
+    await addMessage(text, 'user')
+
+    if (!chatId) {
+        chatId = crypto.randomUUID()
+        window.history.replaceState(null, 'NewChat', `/chat/${chatId}`)
+    }
     //addMessage(testText, 'ai', stream=true)
     //main.scrollTop = main.scrollHeight
 
@@ -219,8 +292,42 @@ async function userSend(text) {
         console.log(decoded)
     }*/
     if (!(window.location.pathname == '/live-chat')) {
-        const request = await fetch(`${apiEndpoint}/chat/answer?message=${text}`)
+        const chatJSON = {
+            role: "user",
+            content: [
+                {
+                    type: 'text',
+                    text: text
+                }
+            ]
+        }
+        
+        // Check klo ada file
+        
+        if (fileArray.length > 0) {
+            for (const file of fileArray) {
+                chatJSON.content.push(file)
+            }
+        }
+        console.log(chatJSON)
+
+        const request = await fetch(`${apiEndpoint}/chat/answer`, {
+            method: "post",
+            headers: {
+                'Accept': 'application/json',
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+                chatId: chatId,
+                files: fileDescArray,
+                data: chatJSON
+            })
+        })
         await addMessage(request, 'ai', true)
+
+        // Kosongin
+        fileDescArray = []
+        fileArray = []
     } else if (window.location.pathname == '/live-chat') {
         const thisUser = username.innerHTML
 
@@ -253,8 +360,129 @@ sendButton.addEventListener('click', (e) => {
 })
 
 inputChat.addEventListener('keypress', (e) => {
-    if (e.key == 'Enter') {
-        userSend(inputChat.value)
+    if (e.key == 'Enter' && !e.shiftKey) {
+        console.log(e.key)
+        e.preventDefault();
+
+        sendButton.click()
         inputChat.value = ''
     }
 })
+
+
+// File Function
+const fileContainer = document.querySelector('.file-container')
+const fileInput = document.getElementById('file-input')
+const fileBtn = document.getElementById('file-btn')
+
+let fileArray = []
+let fileDescArray = []
+
+// For Debug
+let fileArrays = [{
+    type: "image_url",
+    image_url: {
+        url: 'https://res.cloudinary.com/ddsuizdgf/image/upload/v1744437012/wuce2kfpqdlih4jkubwx.png,'
+    }
+}]
+let fileDescArrays = [{
+    file_name: 'fileName',
+    file_url: 'secureURL',
+    file_size: 'sizeCalculated'
+}]
+
+fileBtn.addEventListener('click', (e) => {
+    fileInput.click()
+})
+
+fileInput.onchange = async e => {
+    const file = e.target.files[0]
+    const fileName = file.name
+    const size = Math.floor(file.size / 1024)
+    const sizeCalculated = size >= 1000 ? `${Math.floor(size / 1024)} MB` : `${size} KB` 
+    const type = file.type
+
+    const fileWrapper = document.createElement('div')
+    fileWrapper.classList.add('file-wrapper')
+    fileContainer.appendChild(fileWrapper)
+
+    const preparingHTML = `  <div id="file" class="file-wrapper">
+                                    <div class="thumbnail"><i class="fa-solid fa-file"></i></div>
+                                    <div class="description-wrapper">
+                                        <span class="title">${fileName}</span>
+                                        <span class="full-size">Preparing...</span>
+                                    </div>
+                                </div>`
+
+    fileWrapper.innerHTML = preparingHTML
+
+    uploadFile(fileName, fileWrapper, file, sizeCalculated, type)
+}
+
+
+function uploadFile(fileName, fileWrapper, file, sizeCalculated, type) {
+    const formData = new FormData()
+
+    formData.append('file', file)
+    formData.append('upload_preset', 'chatMediaAI')
+
+    console.log('Uploading ' + fileName)
+
+    const xhr = new XMLHttpRequest()
+    xhr.open('POST', 'https://api.cloudinary.com/v1_1/ddsuizdgf/upload', true)
+
+    xhr.upload.onprogress = function (e) {
+        const total = e.total
+        const uploaded = e.loaded
+
+        console.log(total, uploaded)
+
+        const progress = Math.round(uploaded / total * 100)
+
+        const progressHTML = `  <div id="file" class="file-wrapper">
+                                    <div class="thumbnail"><i class="fa-solid fa-file"></i></div>
+                                    <div class="description-wrapper">
+                                        <span class="title">${fileName}</span>
+                                        <span class="full-size">${sizeCalculated}</span>
+                                        <div class="progress-bar">
+                                            <div class="progress" style="width: ${progress}%" ></div>
+                                        </div>
+                                    </div>
+                                </div>`
+
+        fileWrapper.innerHTML = progressHTML
+    }
+
+    xhr.onload = () => {
+        const completeHTML = `
+                        <div class="thumbnail"><i class="fa-solid fa-file"></i></div>
+                        <div class="description-wrapper">
+                            <span class="title">${fileName}</span>
+                            <span class="full-size">${sizeCalculated}</span>
+                        </div>`
+        
+        fileWrapper.innerHTML = completeHTML
+
+        const response = JSON.parse(xhr.responseText)
+        const secureURL = response.secure_url
+
+        console.log(secureURL)
+
+        fileArray.push({
+            type: "image_url",
+            image_url: {
+                url: secureURL,
+            }
+        })
+
+        fileDescArray.push({
+            file_name: fileName,
+            file_url: secureURL,
+            file_size: sizeCalculated
+        })
+
+        //console.log(fileArray)
+    }
+
+    xhr.send(formData)
+}

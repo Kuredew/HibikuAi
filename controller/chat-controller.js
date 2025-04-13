@@ -21,42 +21,182 @@ const { findChat, loadChat } = require('../services/findChat')
 // Map
 const { get: socketSessionGet } = require('../utils/sessionSocketMap')
 
+// Utils
+const encodeImage = require('../utils/encodeImageToBase64')
+const axios = require('axios')
+
 const converter = new showdown.Converter()
 
 
-async function answer(req, res) {
-    const messageUser = req.query.message
-    const user = req.session.userId
+function pushAndSave(chatContent, obj) {
+    chatContent.content.push(obj)
 
-    let chatContent
-    let chatContentList
+    chatContent.save()
+}
 
-    if (object.session.chatId[user]){
-        const chatId = object.session.chatId[user]
+function makeNewChat(username, userId, chatId) {
 
-        //res.json({ message: `Data Berhasil di dapatkan, pesanmu adalah ${messageUser}` })
-        //console.log(req.body)
+    const newChat = new Chat({
+        username: username,
+        userId: userId,
+        name: null,
+        uuid: chatId,
+        content: [],
+        contentHTML: []
+    })
+    return newChat
+}
 
-        chatContent = await loadChat(user, chatId)
-        chatContentList = chatContent['content']
+async function verifyChatIsExist(userId, chatId) {
+    const check = await loadChat(userId, chatId)
+    if (check) {
+        return true
+    }
+    return false
+}
+
+function getChatId(userId) {
+    if (verifyChatIsExist(userId)) {
+        return object.session.chatId[userId]
+    }
+    return false
+}
+
+async function chatContentLoad(username, userId, chatId) {
+    let chatContent = await loadChat(userId, chatId)
+    if (chatContent) {
+        chatContentArray = chatContent['content']
+
+        return chatContent
     } else {
-        chatContentList = []
-        chatContentList.push({
+        chatContent = makeNewChat(username, userId, chatId)
+        const newObj = {
             role: 'system',
-            content: mainAiContext
-        })
+            content: [
+                {
+                    type: 'text',
+                    text: mainAiContext
+                }
+            ]
+        }
+
+        chatContent.content.push(newObj)
+        chatContent.contentHTML.push(newObj)
+
+        return chatContent
     }
+}
 
-    const userMsgObj = {
-        role: "user",
-        content: messageUser
+function sendTitleToSocketIO(sessionId, title) {
+    const socketId = socketIdArray[sessionId]
+    io.to(socketId).emit('new-chat-title', title)
+}
+
+async function makeTitle(userMsg, AiMsg) {
+    const pertanyaan = `${titleAiQuestion}\n\nPerson1 : ${userMsg}\n\nPerson2 : ${AiMsg}`
+    const pertanyaanObjList = [{
+        role: 'system',
+        content: titleAiContext
+    },{
+        role: 'user',
+        content: pertanyaan
+    }]
+
+    const title = await openaiController.askNoStream(pertanyaanObjList)
+
+    console.log(`[ INFO ] Make title for New Chat: ${title}`)
+
+    return title
+}
+
+async function saveChat(isChatExist, userId, sessionId, chatContent) {
+    if (isChatExist) {
+        chatContent.save()
+    } else {
+        userMessage = chatContent.content[1].content[0].text
+        aiMessage = chatContent.content[2].content[0].text
+
+        object.session.chatId[userId] = chatContent.uuid
+        object.session.newChat[userId] = false
+
+        const title = await makeTitle(userMessage, aiMessage)
+        sendTitleToSocketIO(sessionId, title)
+        
+        chatContent.name = title
+        chatContent.save()
     }
+}
 
-    chatContentList.push(userMsgObj)
+function isChatContainAttachments(messageObj) {
+    if (messageObj.content.length > 1) {
+        return true
+    }
+    return false
+}
 
-    console.log(chatContentList)
-    var response = await openaiController.ask(chatContentList)
+async function formatChat(messageObj, fileDescArray) {
+    // Bikin variable salinan dari messageObj buat di push ke database
+    const messageObjToDB = JSON.parse(JSON.stringify(messageObj))
+    const messageObjToHTML = JSON.parse(JSON.stringify(messageObj))
 
+    if (isChatContainAttachments(messageObj)) {
+        let text = true
+
+        for (const content of messageObj.content) {
+            if (text) {
+                text = false
+                continue
+            }
+
+            // Hapus semua file object yang ada di content
+            messageObjToDB.content.pop()
+            messageObjToHTML.content.pop()
+
+
+            const url = content.image_url.url
+
+            const response = await axios.get(url, { responseType: 'arraybuffer' })
+
+            const base64 = `data:${response.headers['content-type']};base64, ${Buffer.from(response.data).toString('base64')}`
+
+            console.log(`[ INFO ] Converted URL Image to Base64 At ${content}`)
+            content.image_url.url = base64
+        }
+
+        // Khusus untuk html, push deskripsi file ke array content
+        for (const file of fileDescArray) {
+            messageObjToHTML.content.push(file)
+        }
+    }
+    return {
+        toAI: messageObj,
+        toDB: messageObjToDB,
+        toHTML: messageObjToHTML
+    }
+}
+
+
+
+
+async function answer(req, res) {
+    console.log('[ INFO ] Received answer request from client')
+    const chatId = req.body.chatId
+
+    let fileDescArray = req.body.files
+    let messageObj = req.body.data
+
+    const userId = req.session.userId
+    const username = req.session.user
+
+    const isChatExist = await verifyChatIsExist(userId, chatId)
+
+    let chatContent = await chatContentLoad(username, userId, chatId)
+
+    console.log(`[ INFO ] Chat is Exist? ${isChatExist}`)
+
+    messageObj = await formatChat(messageObj, fileDescArray)
+
+    let response = await openaiController.ask(chatContent.content.concat(messageObj.toAI))
 
     res.setHeader('Content-Type', 'application/json');
     res.setHeader('Cache-Control', 'no-cache');
@@ -65,23 +205,39 @@ async function answer(req, res) {
     let responses = ''
     for await (const chunk of response){
         
+        // Ambil Response AI
         const responseFinal = chunk.choices[0]?.delta?.content || ''
+
         if ('finish_reason' in chunk.choices[0]) {
-            console.log('Streaming selesai!')
+            console.log('[ INFO ] Streaming selesai!')
+
             res.write(responseFinal)
-            responses += responseFinal
             res.end()
+            
+            responses += responseFinal
 
             const aiMsgObj = {
                 role: 'assistant',
-                content: responses
+                content: [
+                    {
+                        type: 'text',
+                        text: responses
+                    }
+                ]
             }
         
-            chatContentList.push(aiMsgObj)
+            chatContent.content.push(messageObj.toDB)
+            chatContent.content.push(aiMsgObj)
+            chatContent.contentHTML.push(messageObj.toHTML)
+            chatContent.contentHTML.push(aiMsgObj)
+
+            await saveChat(isChatExist, userId, req.session.id, chatContent)
+
+            /*
             if (object.session.chatId[user]) {
-                chatContent.content = chatContentList
+                chatContent.content.push(aiMsgObj)
                 chatContent.save()
-            }
+            }*/
 
             break
         }
@@ -92,13 +248,11 @@ async function answer(req, res) {
     /*res.json({
         message: response
     })*/
-
-
-
+/*
     if (object.session.chatId[user] == undefined) {
         const socketId = socketIdArray[req.session.id]
 
-        const pertanyaan = `${titleAiQuestion}\n\nPerson1 : ${messageUser}\n\nPerson2 : ${responses}`
+        const pertanyaan = `${titleAiQuestion}\n\nPerson1 : ${messageObj.content[0].text}\n\nPerson2 : ${responses}`
         const pertanyaanObjList = [{
             role: 'system',
             content: titleAiContext
@@ -120,39 +274,73 @@ async function answer(req, res) {
             userId: req.session.userId,
             name: response2,
             uuid: uuidGenerated,
-            content: chatContentList
+            content: chatContentArray
         })
         newChat.save()
 
-        object.session.chatId[user] = uuidGenerated
-        object.session.newChat[user] = false
+        object.session.chatId[userId] = chatContent.uuid
+        object.session.newChat[userId] = false
 
-    }
+    }*/
+}
+
+function isValidUUID(uuid) {
+    const regex = /^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-5][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}$/
+    return regex.test(uuid)
 }
 
 async function load(req, res) {
-    const chatId = req.query.chatId
+    const chatId = req.params.uuid
     const user = req.session.userId
 
+    if (!(isValidUUID(chatId))) {
+        return
+    }
+
+    /*
+    object.session.newChat[user] = 'anyink'
     object.session.chatId[user] = chatId
     object.session.liveChat[user] = false
+    */
+    console.log(`[ INFO ] Loading chat User(${user}) in Chat(${chatId})`)
 
     let chatListConverted = []
-    const loadedChat = await loadChat(req.session.userId, chatId)
+    const loadedChat = await loadChat(user, chatId)
     const chat = await findChat(req.session.userId)
     const chatHistoryList = []
+    //console.log(loadedChat)
 
-    for (const chats of loadedChat.content) {
+    for (const chats of loadedChat.contentHTML) {
         const role = chats['role']
-        const content = chats['content']
+        const content = chats.content
 
-        const convertedContent = converter.makeHtml(content)
+        const text = content[0].text
+        
+        const convertedContent = converter.makeHtml(text)
         const replaceNToBr = convertedContent.replace(/\n/g, "<br>")
-
+        
         const chatListObj = {
             role: role,
-            content: convertedContent
+            content: [{
+                type: 'text',
+                text: convertedContent
+            }]
         }
+
+        if (content.length > 1) {
+            let index = 1
+
+            while (true) {
+                chatListObj.content.push(content[index])
+                //console.log(content[index])
+                
+                if (index + 1 == content.length) {
+                    break
+                }
+                index += 1
+            }
+        }
+        
         chatListConverted.push(chatListObj)
     }
 
@@ -170,17 +358,17 @@ async function load(req, res) {
     }
     loadedChatList = []
 
-    res.render('chat', { user: loadedChat.name, chats: chatHistoryList.reverse(), loadedChat: chatListConverted })
+    res.render('chat', { user: loadedChat.name, chatId: loadedChat.uuid, chats: chatHistoryList.reverse(), loadedChat: chatListConverted })
 
 }
-async function render(req, res, next) {   
-    object.session.chatId[req.session.userId] = undefined
-    object.session.liveChat[req.session.userId] = false
+async function render(req, res, next) {
+
+    //object.session.chatId[req.session.userId] = undefined
+    //object.session.liveChat[req.session.userId] = false
+    //object.session.newChat[req.session.userId] = true
 
     const findedChat = await findChat(req.session.userId)
-    res.render('chat', { user: req.session.user, chats: findedChat.reverse(), loadedChat: []})
-
-    next()
+    res.render('chat', { user: req.session.user, chatId: null, chats: findedChat.reverse(), loadedChat: []})
 }
 
 function log(req, res) {

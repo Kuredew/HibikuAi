@@ -19,14 +19,14 @@ io.on('connection', (socket) => {
 
     if (session && session.id) {
         socketIdArray[session.id] = socket.id
-        console.log(`[ ${socket.id} ] Connected to Server`)
+        console.log(`[ INFO ] ${socket.id} Connected to Server`)
     }
 
     socket.on('disconnect', () => {
         if (session && session.id) {
             delete socketIdArray[session.id]
 
-            console.log(`[ ${socket.id} ] Disconnected`)
+            console.log(`[ INFO ] ${socket.id} Disconnected`)
         }
     })
 })

@@ -5,7 +5,8 @@ const chatSchema = new mongoose.Schema({
     userId: String,
     name: String,
     uuid: String,
-    content: Array
+    content: Array,
+    contentHTML: Array
 })
 
 module.exports = chatSchema

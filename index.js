@@ -4,6 +4,18 @@ const loginRouter = require('./routes/login-routes')
 const chatRouter = require('./routes/chat-routes')
 const liveChatRouter = require('./routes/liveChat-router')
 const app = require('./configs/express')
+const object = require('./constants/session')
+
+function sleep(ms) {
+    return new Promise(resolve => setTimeout(resolve, ms));
+};
+
+async function sessionLog() {
+    while (true) {
+        console.log(object.session)
+        await sleep(3000)
+    }
+}
 
 
 // routes

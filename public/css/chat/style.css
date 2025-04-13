@@ -20,6 +20,7 @@ html{
     margin: 0;
     padding: 0;
     box-sizing: border-box;
+    -webkit-tap-highlight-color: transparent;
 }
 
 /* Global Atribut */
@@ -42,7 +43,7 @@ h4{
 
 
 *{
-    line-height: 25px;
+    line-height: 30px;
 }
 
 main .chat-container .ai-chat p{
@@ -66,6 +67,9 @@ li {
 code{
     display: inline-block;
     border-radius: 20px;
+}
+em {
+    opacity: 80%;
 }
 
 ::-webkit-scrollbar {
@@ -206,7 +210,21 @@ img{
     background-color: rgb(68, 68, 68);
 }
 
-
+/* HTML: <div class="loader"></div> */
+.loader {
+    margin: 40px 0;
+    width: 20px;
+    aspect-ratio: 1;
+    border-radius: 50%;
+    background: 
+      radial-gradient(farthest-side,#1a16ff 94%,#0000) top/2px 2px no-repeat,
+      conic-gradient(#0000 30%,#d8d4ff);
+    -webkit-mask: radial-gradient(farthest-side,#0000 calc(100% - 2px),#000 0);
+    animation: l13 1s infinite linear;
+}
+@keyframes l13{ 
+100%{transform: rotate(1turn)}
+}
 
 main{
     overflow-y: scroll;
@@ -218,19 +236,100 @@ main::-webkit-scrollbar {
     overflow: hidden;
 }
 
+.welcome {
+    padding: 0 10%;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+}
+.welcome .title {
+    text-align: center;
+}
+.welcome .desc {
+    text-align: center;
+}
+.welcome .additional{
+    margin-top: 20px;
+    text-decoration: none;
+    background-color: rgb(61, 61, 61);
+    border-radius: 15px;
+    padding: 5px 10px;
+    transition: 0.5s;
+}
+.welcome .additional:hover{
+    background-color: rgb(29, 29, 29);
+}
+.welcome .additional a{
+    text-decoration: none;
+    color: white;
+    height: 100%;
+    width: 100%;
+}
+
 .chat-container{
     padding-left: 10%;
     padding-right: 10%;
-    padding-bottom: 165px;
+}
+
+.chat-container .attachments {
+    width: fit-content;
+    margin-left: auto;
+    margin-bottom: 5px;
+    display: flex;
+    gap: 15px;
+}
+
+.chat-container .attachments .file-wrapper {
+    background-color: rgb(51, 51, 51);
+    padding-right: 20px;
+    display: flex;
+    align-items: center;
+    border-radius: 10px;
+    padding: 5px 10px;
+    height: 100%;
+    gap: 20px;
+}
+
+.chat-container .attachments .file-wrapper .thumbnail {
+    width: 40px;
+    height: 40px;
+    background-color: rgb(75, 75, 75);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 10px;
+}
+
+.chat-container .attachments .file-wrapper .description-wrapper{
+    display: flex;
+    flex-direction: column;
+}
+
+.chat-container .attachments .file-wrapper .description-wrapper .title {
+    height: 20px;
+    font-size: small;
+}
+.chat-container .attachments .file-wrapper .description-wrapper .full-size {
+    font-size: x-small;
+    opacity: 80%;
+}
+.chat-container .attachments .file-wrapper .description-wrapper .full-size a {
+    margin-left: 10px;
+}
+.chat-container .attachments .file-wrapper .description-wrapper .full-size .link:hover {
+    color: rgb(78, 78, 255);
+    cursor: pointer;
 }
 
 .user-chat{
-    margin-bottom: 50px;
-    border-radius: 20px;
+    margin-bottom: 5px;
+    border-radius: 20px 20px 0 20px;
 
     width: fit-content;
     max-width: 40vw;
-    padding: 10px;
+    padding: 10px 20px;
     margin-left: auto;
     background-color: rgb(46, 46, 46);
     animation: fadeIn 0.5s ease-out;
@@ -250,8 +349,10 @@ main::-webkit-scrollbar {
 
 
 .ai-chat{
-    margin-bottom: 50px;
+    margin-top: 40px;
+    margin-bottom: 40px;
     animation: fadeIn 1s ease-out;
+    color: rgb(255, 255, 255);
 }
 
 footer{
@@ -271,12 +372,83 @@ footer{
     align-items: center;
 }
 
+.input-wrapper .file-container{
+    display: flex;
+    width: 100%;
+    gap: 10px;
+    align-items: end;
+}
+
+.input-wrapper .file-container .file-wrapper {
+    background-color: rgb(56, 56, 56);
+    margin-bottom: 5px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 5px;
+    padding-right: 10px;
+    border-radius: 10px;
+    width: fit-content;
+    height: fit-content;
+}
+
+.input-wrapper .file-container .file-wrapper .thumbnail {
+    height: 40px;
+    width: 40px;
+    border: solid rgb(99, 99, 99) 1px;
+    
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 10px;
+}
+
+.input-wrapper .file-container .file-wrapper .description-wrapper {
+    display: flex;
+    flex-direction: column;
+    line-height: 0px;
+}
+
+.input-wrapper .file-container .file-wrapper .description-wrapper .title {
+    height: 20px;
+    font-size: small;
+}
+
+
+.input-wrapper .file-container .file-wrapper .description-wrapper .full-size {
+    opacity: 80%;
+    font-size: x-small;
+}
+
+.input-wrapper .file-container .file-wrapper .description-wrapper .progress-bar {
+    width: 100%;
+    height: 2px;
+}
+
+.input-wrapper .file-container .file-wrapper .description-wrapper .progress-bar .progress {
+    background-color: rgb(255, 255, 255);
+    width: 30%;
+    height: 100%;
+    transition: 2s;
+}
+
+.input-wrapper {
+    padding: 0 10% 15px 10%;
+    width: 100%;
+    box-sizing: border-box;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
 .input-wrapper .attention {
     font-size: smaller;
     opacity: 80%;
 }
 
-
+textarea{
+    padding-right: 10px;
+}
 .input-container{
     padding-top: 10px;
     padding-bottom: 10px;
@@ -516,6 +688,9 @@ aside .container {
 }
 
 @media(max-width: 800px) {
+    *{
+        line-height: 25px;
+    }
     body{
         grid-template-columns: 0px 1fr;
         font-size: smaller;
