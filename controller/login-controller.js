@@ -16,19 +16,14 @@ async function login(req, res) {
         req.session.user = user.username
         req.session.userId = user._id
         req.session.loggedIn = true
-        res.redirect('/chat')
+        res.redirect('/')
     } else {
         req.flash('error', 'Email/Username/Password Salah!')
         res.redirect('/login')
     }
 }
 
-function redirect(req, res) {
-    res.redirect('/chat')
-}
-
 module.exports = { 
     formLogin,
-    login,
-    redirect
+    login
 }

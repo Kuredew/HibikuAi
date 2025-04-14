@@ -293,9 +293,6 @@ async function load(req, res) {
     const chatId = req.params.uuid
     const user = req.session.userId
 
-    if (!(isValidUUID(chatId))) {
-        return
-    }
 
     /*
     object.session.newChat[user] = 'anyink'
@@ -309,6 +306,12 @@ async function load(req, res) {
     const chat = await findChat(req.session.userId)
     const chatHistoryList = []
     //console.log(loadedChat)
+
+    // Fallback to root if chat is null
+    if (!(loadedChat)) {
+        res.redirect('/')
+        return
+    }
 
     for (const chats of loadedChat.contentHTML) {
         const role = chats['role']

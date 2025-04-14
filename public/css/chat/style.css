@@ -248,13 +248,14 @@ main::-webkit-scrollbar {
     text-align: center;
 }
 .welcome .desc {
+    font-size: smaller;
     text-align: center;
 }
 .welcome .additional{
     margin-top: 20px;
     text-decoration: none;
     background-color: rgb(61, 61, 61);
-    border-radius: 15px;
+    border-radius: 5px;
     padding: 5px 10px;
     transition: 0.5s;
 }

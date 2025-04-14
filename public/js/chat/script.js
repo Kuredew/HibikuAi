@@ -4,64 +4,29 @@ const backgroundSidebar = document.getElementById('background-sidebar')
 const nav = document.getElementById('nav')
 const profile = document.getElementById('profile')
 const main = document.getElementById('main')
-main.scrollTop = main.scrollHeight
 const backgroundProfileOptions = document.getElementById('background-profile-options')
 const sendButton = document.getElementById('send-btn')
 const chatContainer = document.getElementById('chat-container')
 const inputChat = document.getElementById('input-chat')
 const chatHistory = document.getElementById('chat-history')
 const username = document.getElementById('username')
+
 let chatId = window.location.pathname.split('/')[2]
-console.log(chatId)
 
-function removeWelcome() {
-    document.querySelector('.welcome').remove()
-}
+//Sleep Function//
+function sleep(ms) {
+    return new Promise(resolve => setTimeout(resolve, ms));
+};
 
-let isWelcomeRemoved
-if (chatContainer.contains(document.querySelector('.user-chat'))) {
-    removeWelcome()
-
-    chatContainer.style.paddingBottom = '165px'
-    isWelcomeRemoved = true
-} else {
-    isWelcomeRemoved = false
-}
-
-sendButton.disabled = true
-mainScrollDown()
-
-const textarea = document.getElementById('input-chat');
-
-        textarea.addEventListener('input', (e) => {
-            if (textarea.value.length > 0) {
-                sendButton.disabled = false
-            } else {
-                sendButton.disabled = true
-            }
-
-            textarea.style.height = '40px'
-            let scrollHeight = textarea.scrollHeight
-            textarea.style.height = `${scrollHeight}px`
-            chatContainer.style.paddingBottom = `${165 + scrollHeight - 40}px`
-        })
-
+//Load API Endpoint to Server//
 const apiEndpoint = `${window.location.protocol}//${window.location.hostname}`
 console.log(`Loaded apiEndpoint at ${apiEndpoint}`)
 
-function toggleSidebar(){
-    sidebar.classList.add('show');
-    backgroundSidebar.classList.add('background-sidebar')
-}
 
-hljs.configure({useBR: true})
-
-
-hljs.highlightAll()
-
-// Import Socket IO
+//Import Socket IO//
 const socket = io(apiEndpoint)
 
+//Socket IO Configuration//
 socket.on('new-chat-title', (title) => {
     console.log(`Mendapatkan judul baru : ${title}`)
 
@@ -89,8 +54,6 @@ socket.on('new-chat-title', (title) => {
 
     chatHistory.insertBefore(div, chatHistory.firstChild)
 })
-
-
 socket.on('live-chat-message', (obj) => {
     const thisUser = username.innerHTML
     console.log(obj)
@@ -104,21 +67,71 @@ socket.on('live-chat-message', (obj) => {
         console.log('Mendapatkan pesan dari SocketIo')
     }
 })
-
 socket.on('alert', (content) => {
     console.log(content)
 })
 
-function sleep(ms) {
-    return new Promise(resolve => setTimeout(resolve, ms));
-};
 
+//Remove Welcome Function//
+function removeWelcome() {
+    document.querySelector('.welcome').remove()
+}
+let isWelcomeRemoved
+if (chatContainer.contains(document.querySelector('.user-chat'))) {
+    removeWelcome()
+
+    chatContainer.style.paddingBottom = '165px'
+    isWelcomeRemoved = true
+} else {
+    isWelcomeRemoved = false
+}
+
+
+//Main ScrollDown Funcion//
+function mainScrollDown() {
+    main.scrollTo({
+        top: main.scrollHeight,
+        behavior: 'smooth'
+    })
+}
+sendButton.disabled = true
+mainScrollDown()
+
+
+//TextArea Auto Expand//
+const textarea = document.getElementById('input-chat');
+textarea.addEventListener('input', (e) => {
+    if (textarea.value.length > 0) {
+        sendButton.disabled = false
+    } else {
+        sendButton.disabled = true
+    }
+
+    textarea.style.height = '40px'
+    let scrollHeight = textarea.scrollHeight
+    textarea.style.height = `${scrollHeight}px`
+    chatContainer.style.paddingBottom = `${165 + scrollHeight - 40}px`
+})
+
+
+//Toggle Sidebar Function//
+function toggleSidebar(){
+    sidebar.classList.add('show');
+    backgroundSidebar.classList.add('background-sidebar')
+}
 btnSidebar.addEventListener('click', toggleSidebar)
 backgroundSidebar.addEventListener('click', (e) => {
     sidebar.classList.remove('show')
     backgroundSidebar.classList.remove('background-sidebar')
 })
 
+
+//Highlight JS//
+hljs.configure({useBR: true})
+hljs.highlightAll()
+
+
+//Profile Options//
 function toggleProfileOptions() {
     const div = document.createElement('div')
     const logoutA = document.createElement('a')
@@ -143,19 +156,12 @@ function toggleProfileOptions() {
         backgroundProfileOptions.classList.remove('background-profile-options')
     })
 }
-
 profile.addEventListener('click', toggleProfileOptions)
 
-function mainScrollDown() {
-    main.scrollTo({
-        top: main.scrollHeight,
-        behavior: 'smooth'
-    })
-}
-
-// Message Handling
+//Debug Text//
 const testText = 'lorem ipsum fdsalfjdslkafklsdjkckdsnklckdsfkfnklasfsd fsadjklfdsjal fdsn fkldsnfdn fkdsfkdscn skafnknd dsncdskcjsnc dscndscj dsjncdslancs al'
 
+//Add Message To Chat Container Function//
 const converter = new showdown.Converter()
 async function addMessage(text, entity, stream=false) {
     const userChat = document.createElement('div')
@@ -235,6 +241,7 @@ async function addMessage(text, entity, stream=false) {
     }
 }
 
+//Add Attachments Function//
 async function addAttachments(fileDescArray) {
     const attachmentsDiv = document.createElement('div')
     attachmentsDiv.classList.add('attachments')
@@ -254,6 +261,8 @@ async function addAttachments(fileDescArray) {
     }
     attachmentsDiv.innerHTML = innerHTML
 }
+
+//User Send Function//
 async function userSend(text) {
     fileContainer.innerHTML = ''
 
@@ -353,12 +362,10 @@ async function userSend(text) {
 
     await addMessage(message, 'ai', true)*/
 }
-
 sendButton.addEventListener('click', (e) => {
     userSend(inputChat.value)
     inputChat.value = ''
 })
-
 inputChat.addEventListener('keypress', (e) => {
     if (e.key == 'Enter' && !e.shiftKey) {
         console.log(e.key)
@@ -370,7 +377,7 @@ inputChat.addEventListener('keypress', (e) => {
 })
 
 
-// File Function
+//File Function//
 const fileContainer = document.querySelector('.file-container')
 const fileInput = document.getElementById('file-input')
 const fileBtn = document.getElementById('file-btn')
@@ -394,7 +401,6 @@ let fileDescArrays = [{
 fileBtn.addEventListener('click', (e) => {
     fileInput.click()
 })
-
 fileInput.onchange = async e => {
     const file = e.target.files[0]
     const fileName = file.name
@@ -418,8 +424,6 @@ fileInput.onchange = async e => {
 
     uploadFile(fileName, fileWrapper, file, sizeCalculated, type)
 }
-
-
 function uploadFile(fileName, fileWrapper, file, sizeCalculated, type) {
     const formData = new FormData()
 
