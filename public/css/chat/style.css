@@ -139,7 +139,7 @@ nav{
 }
 
 .model-name{
-    padding: 5px;
+    padding: 5px 10px;
     border-radius: 10px;
     transition: 0.5s;
 }
@@ -340,11 +340,11 @@ main::-webkit-scrollbar {
 
 .friend-chat{
     margin-bottom: 10px;
-    border-radius: 20px;
+    border-radius: 20px 20px 20px 0;
 
     width: fit-content;
     max-width: 60vw;
-    padding: 10px 10px 10px 10px;
+    padding: 10px 20px;
     background-color: rgb(46, 46, 46);
 }
 
@@ -642,6 +642,7 @@ aside .container {
     }
 */
 
+
 .sidebar-chat-history .chat-history .chat .chat-box a{
     color: linear;
     padding-left: 10px;
@@ -657,17 +658,24 @@ aside .container {
 }
 
 .sidebar-chat-history .chat-history .chat .chat-box a p{
-    color: white;
-    display: block;/* or inline-block */
-  text-overflow: ellipsis;
-  word-wrap: break-word;
-  overflow: hidden;
+    /* or inline-block */
+  /*text-overflow: ellipsis;*/
+  /*word-wrap: break-word;*/
+  /*
+  
   max-height: 1.8em;
-  line-height: 1.8em;
+  line-height: 1.8em;*/
+  white-space: nowrap;
+  background-image: linear-gradient(to right, rgb(255, 255, 255) 60%, rgb(29, 29, 29));
+    color: transparent;
+    background-clip: text;
+    width: 100%;
+    overflow: hidden;
 }
 
 .sidebar-chat-history .chat-history .chat .active a{
     background-color: rgb(53, 53, 53);
+    position: relative;
 }
 
 .sidebar-chat-history .chat-history .chat-box a:hover{

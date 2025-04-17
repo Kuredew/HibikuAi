@@ -1,8 +1,11 @@
 const User = require('./models/userModel')
 
+// Router
 const loginRouter = require('./routes/login-routes')
 const chatRouter = require('./routes/chat-routes')
 const liveChatRouter = require('./routes/liveChat-router')
+const oneShotRouter = require('./routes/oneShot-router')
+
 const app = require('./configs/express')
 const object = require('./constants/session')
 
@@ -22,6 +25,7 @@ async function sessionLog() {
 app.use('/', loginRouter)
 app.use('/chat', chatRouter)
 app.use('/live-chat', liveChatRouter)
+app.use('/one-shot', oneShotRouter)
 
 app.get('/dashboard', (req, res) => {
     if (!req.session.user) {

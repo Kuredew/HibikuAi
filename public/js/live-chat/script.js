@@ -5,11 +5,13 @@ const nav = document.getElementById('nav')
 const profile = document.getElementById('profile')
 const main = document.getElementById('main')
 const backgroundProfileOptions = document.getElementById('background-profile-options')
-const sendButton = document.getElementById('send-btn')
+const sendButton = document.getElementById('send-global-btn')
 const chatContainer = document.getElementById('chat-container')
 const inputChat = document.getElementById('input-chat')
 const chatHistory = document.getElementById('chat-history')
 const username = document.getElementById('username')
+const userId = document.getElementById('username').dataset.uuid
+console.log(userId)
 
 let chatId = window.location.pathname.split('/')[2]
 
@@ -55,16 +57,50 @@ socket.on('new-chat-title', (title) => {
     chatHistory.insertBefore(div, chatHistory.firstChild)
 })
 socket.on('live-chat-message', (obj) => {
-    const thisUser = username.innerHTML
     console.log(obj)
 
     const user = obj['user']
     const message = obj['message']
     const finalMessage = `**${user}**<br>${message}`
 
-    if (!(thisUser == user) && window.location.pathname == '/live-chat') {
+    if (!(userId == obj.userId) && window.location.pathname == '/live-chat') {
         addMessage(finalMessage, 'friend-chat')
-        console.log('Mendapatkan pesan dari SocketIo')
+        console.log('[ INFO ] Mendapatkan pesan dari SocketIo')
+    }
+})
+socket.on('live-chat-ai', async(response) => {
+    console.log('[ INFO ] Mendapatkan pesan AI dari socket io, Mengecek apakah User berada pada page LiveChat?')
+
+    if (window.location.pathname == '/live-chat') {
+        console.log('[ INFO ] User berada pada Page livechat!, memulai render CHat.')
+
+        // Delete Loading Animation
+        const loader = document.querySelector('.loader')
+        if (loader) {
+            loader.remove()
+        }
+
+        const messageDiv = document.createElement('div')
+        messageDiv.classList.add('ai-chat')
+
+        chatContainer.appendChild(messageDiv)
+
+        responseArray = response.split(/(\s+)/)
+
+        let responseBucket = ''
+        for await(const chunk of responseArray) {
+            responseBucket += chunk
+
+            // Convert response to html
+            htmlConverted = converter.makeHtml(responseBucket)
+            
+            messageDiv.innerHTML = htmlConverted
+
+            await sleep(20)
+        }
+
+        // Highlight Code
+        hljs.highlightAll()
     }
 })
 socket.on('alert', (content) => {
@@ -95,7 +131,7 @@ function mainScrollDown() {
     })
 }
 sendButton.disabled = true
-main.scrollTop = main.scrollHeight
+mainScrollDown()
 
 
 //TextArea Auto Expand//
@@ -259,6 +295,12 @@ async function addAttachments(fileDescArray) {
     attachmentsDiv.innerHTML = innerHTML
 }
 
+async function addLoading() {
+    loadingDiv = document.createElement('div')
+    loadingDiv.classList.add('loader')
+
+    chatContainer.appendChild(loadingDiv)
+}
 
 //User Send Function//
 async function userSend(text) {
@@ -301,11 +343,7 @@ async function userSend(text) {
             window.history.replaceState(null, 'NewChat', `/chat/${chatId}`)
         }
 
-        loadingDiv = document.createElement('div')
-        loadingDiv.classList.add('loader')
-
-        chatContainer.appendChild(loadingDiv)
-
+        await addLoading()
         mainScrollDown()
 
         const chatJSON = {
@@ -319,7 +357,6 @@ async function userSend(text) {
         }
         
         // Check klo ada file
-        
         if (fileArray.length > 0) {
             for (const file of fileArray) {
                 chatJSON.content.push(file)
@@ -356,6 +393,7 @@ async function userSend(text) {
                 'Content-Type': 'application/json'
             },
             body: JSON.stringify({
+                userId: userId,
                 message: text
             })
         })
@@ -383,6 +421,34 @@ inputChat.addEventListener('keypress', (e) => {
     }
 })
 
+
+const sendAIButton = document.getElementById('send-ai-btn')
+sendAIButton.addEventListener('click', async() => {
+    inputUser = inputChat.value
+    inputChat.value = ''
+
+    await addMessage(inputUser, 'user')
+    await addLoading()
+    mainScrollDown()
+
+    // Fetch to Oneshot API
+    const fetchOptions = {
+        method: 'post',
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+            role: 'user',
+            content: [
+                {
+                    type: 'text',
+                    text: inputUser
+                }
+            ]
+        })
+    }
+    fetch(`${apiEndpoint}/one-shot/live-chat`, fetchOptions)
+})
 
 //File Function//
 const fileContainer = document.querySelector('.file-container')

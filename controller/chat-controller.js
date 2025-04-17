@@ -24,6 +24,7 @@ const { get: socketSessionGet } = require('../utils/sessionSocketMap')
 // Utils
 const encodeImage = require('../utils/encodeImageToBase64')
 const axios = require('axios')
+const { stringify } = require('querystring')
 
 const converter = new showdown.Converter()
 
@@ -348,8 +349,8 @@ async function load(req, res) {
     }
 
     for (const chats of chat) {
-        const chatName = chats['name']
-        const uuid = chats['uuid']
+        const chatName = chats.name
+        const uuid = chats.uuid
 
         const obj = {
             name: chatName,
